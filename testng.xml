@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Gmail tests">
+    <test name="sample test">
+        <classes>
+            <class name="com.gmail.automation.GmailTests"/>
+        </classes>
+    </test>
+</suite>

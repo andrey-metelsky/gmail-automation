@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gmail-automation.iml" filepath="$PROJECT_DIR$/.idea/modules/gmail-automation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gmail-automation_main.iml" filepath="$PROJECT_DIR$/.idea/modules/gmail-automation_main.iml" group="gmail-automation" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gmail-automation_test.iml" filepath="$PROJECT_DIR$/.idea/modules/gmail-automation_test.iml" group="gmail-automation" />
+    </modules>
+  </component>
+</project>
