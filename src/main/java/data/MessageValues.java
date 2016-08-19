@@ -1,6 +1,6 @@
 package data;
 
-import static pageobject.BasePage.getRandomString;
+import static utils.utils.getRandomString;
 
 public enum MessageValues {
 

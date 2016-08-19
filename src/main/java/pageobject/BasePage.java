@@ -1,27 +1,33 @@
 package pageobject;
 
+import client.DriverFactory;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.NoSuchElementException;
+
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 public class BasePage {
 
-    WebDriverWait webDriverWait;
-    WebDriver driver;
+    protected WebDriver webDriver = DriverFactory.getInstance().getWebDriver();
+    private WebDriverWait webDriverWait = new WebDriverWait(this.webDriver, DriverFactory.TIME_WAIT_SECONDS);
 
-//    protected static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
+    protected static final Logger LOGGER = getLogger(BasePage.class);
 
     public WebDriver getWebDriver() {
-        return driver;
+        return this.webDriver;
     }
 
     public BasePage() {
-        webDriverWait = new WebDriverWait(driver, 10);
-        PageFactory.initElements(driver, this);
+        PageFactory.initElements(webDriver, this);
     }
 
     public void sendKeys(final WebElement webElement, String text) {
@@ -31,30 +37,30 @@ public class BasePage {
     }
 
     public WebElement waitForVisibility(WebElement webElement) {
-        /*try {*/
-        webDriverWait.until(ExpectedConditions.visibilityOf(webElement));
-      /*  } catch (NoSuchElementException nse) {
+        try {
+            webDriverWait.until(ExpectedConditions.visibilityOf(webElement));
+        } catch (NoSuchElementException nse) {
             LOGGER.error("", nse);
             return null;
-        }*/
+        }
         return webElement;
     }
 
-    public void waitForInvisibility(final By locator) {
-      /*  try {*/
-        webDriverWait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
-      /*  } catch (NoSuchElementException e) {
+    public void waitForInvisibility(By locator) {
+        try {
+            webDriverWait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
+        } catch (NoSuchElementException e) {
             LOGGER.error("", e);
-        }*/
+        }
     }
 
     public WebElement waitForClickable(WebElement webElement) {
         waitForVisibility(webElement);
-    /*    try {*/
-        webDriverWait.until(ExpectedConditions.elementToBeClickable(webElement));
-     /*   } catch (NoSuchElementException nse) {
+        try {
+            webDriverWait.until(ExpectedConditions.elementToBeClickable(webElement));
+        } catch (NoSuchElementException nse) {
             LOGGER.error("Try to wait little more (wait for clickable)", nse);
-        }*/
+        }
         return webElement;
     }
 
@@ -74,24 +80,56 @@ public class BasePage {
 
     private void pureSafeClick(WebElement webElement) {
         for (int i = 0; i < 10; i++) {
-           /* try {*/
-            webElement.click();
-            break;
-           /* } catch (Exception e) {
+            try {
+                webElement.click();
+                break;
+            } catch (Exception e) {
                 LOGGER.error("Click failed", e);
                 pause();
-            }*/
+            }
         }
     }
 
-    public void uploadFile(WebElement webElement, File file) {
+    public void uploadFileViaWindowPrompt(WebElement webElement, File file) throws AWTException, InterruptedException {
         if (file != null) {
-                JavascriptExecutor jsExecutor = (JavascriptExecutor) getWebDriver();
-                jsExecutor.executeScript("arguments[0].setAttribute('style', 'margin: 0px; padding: 0px; width: 1px; height: 1px; position: absolute; opacity: 1;')", webElement);
-            }
-            webElement.sendKeys(file.getAbsolutePath());
+            click(webElement);
+            pause();
+            StringSelection filePath = new StringSelection(file.getAbsolutePath());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(filePath, null);
+            Robot robot = new Robot();
+            robot.keyPress(KeyEvent.VK_ENTER);
+            robot.keyRelease(KeyEvent.VK_ENTER);
+            robot.keyPress(KeyEvent.VK_CONTROL);
+            robot.keyPress(KeyEvent.VK_V);
+            robot.keyRelease(KeyEvent.VK_V);
+            robot.keyRelease(KeyEvent.VK_CONTROL);
+            robot.keyPress(KeyEvent.VK_ENTER);
+            robot.keyRelease(KeyEvent.VK_ENTER);
+        }
     }
 
+    public boolean isElementPresent(final WebElement we) {
+        webDriver.getPageSource();
+        try {
+            return we.isDisplayed();
+        } catch (Exception e) {
+            LOGGER.error("Element is not displayed", e);
+            return false;
+        }
+    }
+
+    public void pause() {
+       try {
+        Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            LOGGER.error("", e);
+        }
+    }
+
+    public void
+    moveMouseCursorToWebElement(WebElement webElement) {
+        waitForClickable(webElement);
+        Actions action = new Actions(getWebDriver());
+        action.moveToElement(webElement).perform();
+    }
 }
-
-
